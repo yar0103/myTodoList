@@ -1,7 +1,16 @@
 import { useState } from 'react';
 import './App.css';
 
-const TodoWriteForm = ({ newTodoTitle, setNewTodoTitle, addTodo }) => {
+const TodoWriteForm = ({ addTodo:_addTodo }) => {
+  const [newTodoTitle, setNewTodoTitle] = useState('');
+
+  const addTodo = () => {
+    if(newTodoTitle.trim().length == 0) return;
+
+    _addTodo(newTodoTitle);
+    setNewTodoTitle('');
+  }
+
   return (
     <div className="addInput flex justify-content-center">
       <input
@@ -19,7 +28,7 @@ const TodoWriteForm = ({ newTodoTitle, setNewTodoTitle, addTodo }) => {
           width="50"
           height="50"
           fill="green"
-          onClick={addTodo}
+          onClick={ addTodo }
           class="bi bi-plus-circle-fill"
           viewBox="0 0 16 16"
         >
@@ -30,22 +39,27 @@ const TodoWriteForm = ({ newTodoTitle, setNewTodoTitle, addTodo }) => {
   );
 };
 
-const TodoListItem = ({ todo, todos, i, setTodos }) => {
+const TodoListItem = ({ todo, i, removeTodo:_removeTodo, modifyTodo:_modifyTodo }) => {
   console.log(`i : ${i}`);
 
   const [change, setChange] = useState(false);
   const [newTitle, setNewTitle] = useState(todo);
 
   const removeTodo = () => {
-    const newTodos = todos.filter((_, _i) => i != _i);
-    setTodos(newTodos);
+    _removeTodo(i)
   };
+
+  const modifyTodo = () => {
+    if(newTitle.trim().length == 0) return;
+    _modifyTodo(i, newTitle.trim());
+    setChange(false)
+  }
 
   const changeTodo = () => {
     setChange(true);
   };
 
-  const read = () => {
+  const cancel = () => {
     setNewTitle(todo);
     setChange(false);
   };
@@ -72,7 +86,7 @@ const TodoListItem = ({ todo, todos, i, setTodos }) => {
                 }}
               />
               <div className='flex'>
-                <button className="btn btnNone" onClick={read}>
+                <button name='changeCancle' className="btn btnNone" onClick={cancel}>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="40"
@@ -85,7 +99,7 @@ const TodoListItem = ({ todo, todos, i, setTodos }) => {
                   </svg>
                 </button>
                   {/* 여기부터 onclick 넣어줘야함*/}
-                <button className="btn btnNone editBox">
+                <button name='changeOk' className="btn btnNone editBox" onClick={modifyTodo}>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="40"
@@ -136,7 +150,7 @@ const TodoListItem = ({ todo, todos, i, setTodos }) => {
   );
 };
 
-const TodoList = ({ todos, setTodos }) => {
+const TodoList = ({ todos, removeTodo, modifyTodo }) => {
   return (
     <div>
       {todos.map((todo, i) => (
@@ -144,8 +158,8 @@ const TodoList = ({ todos, setTodos }) => {
           key={i}
           i={i}
           todo={todo}
-          todos={todos}
-          setTodos={setTodos}
+          removeTodo={removeTodo}
+          modifyTodo={modifyTodo}
         />
       ))}
     </div>
@@ -169,14 +183,22 @@ const CurrentTime = () => {
 
 function App() {
   const [todos, setTodos] = useState([]);
-  const [newTodoTitle, setNewTodoTitle] = useState('');
-
-  const addTodo = () => {
+  
+  const addTodo = (newTitle) => {
     //공백상태도 입력되기 때문에 검사
-    if (newTodoTitle.trim().length == 0) return;
-    setTodos([...todos, newTodoTitle.trim()]);
-    setNewTodoTitle('');
+    if (newTitle.trim().length == 0) return;
+    setTodos([...todos, newTitle.trim()]);
   };
+
+  const removeTodo = (i) => {
+    const newTodos = todos.filter((_, _i) => _i != i);
+    setTodos(newTodos);
+  };
+
+  const modifyTodo = (i, todo) => {
+    const newTodos = todos.map((_todo, _i) => _i != i ? _todo : todo);
+    setTodos(newTodos);
+  }
 
   return (
     <div className="App">
@@ -184,11 +206,9 @@ function App() {
         <div className="container">
           <CurrentTime />
           <TodoWriteForm
-            newTodoTitle={newTodoTitle}
-            setNewTodoTitle={setNewTodoTitle}
             addTodo={addTodo}
           />
-          <TodoList todos={todos} setTodos={setTodos} />
+          <TodoList todos={todos} removeTodo={removeTodo} modifyTodo={modifyTodo} />
         </div>
       </div>
     </div>
