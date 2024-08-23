@@ -150,21 +150,7 @@ const TodoListItem = ({ todo, i, removeTodo:_removeTodo, modifyTodo:_modifyTodo 
   );
 };
 
-const TodoList = ({ todos, removeTodo, modifyTodo }) => {
-  return (
-    <div>
-      {todos.map((todo, i) => (
-        <TodoListItem
-          key={i}
-          i={i}
-          todo={todo}
-          removeTodo={removeTodo}
-          modifyTodo={modifyTodo}
-        />
-      ))}
-    </div>
-  );
-};
+
 
 const CurrentTime = () => {
   const today = new Date();
@@ -183,6 +169,29 @@ const CurrentTime = () => {
 
 function App() {
   const [todos, setTodos] = useState([]);
+  {todos.map((todo)=>{
+    return(
+      <li>{todo}</li>
+    )
+  })}
+  
+  {todos.map((todo)=> <li>{todo}</li> )}
+  
+  const TodoList = ({ todos, removeTodo, modifyTodo }) => {
+    return (
+      <div>
+        {todos.map((todo, i) => (
+          <TodoListItem
+            key={i}
+            i={i}
+            todo={todo}
+            removeTodo={removeTodo}
+            modifyTodo={modifyTodo}
+          />
+        ))}
+      </div>
+    );
+  };
   
   const addTodo = (newTitle) => {
     //공백상태도 입력되기 때문에 검사
